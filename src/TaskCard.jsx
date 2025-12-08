@@ -1,4 +1,4 @@
-import { Trash2, MessageSquare} from 'lucide-react';
+import { Trash2, MessageSquare, Clock} from 'lucide-react';
 import Avatar from './Avatar';
 
 const priorityColors = {
@@ -9,6 +9,9 @@ const priorityColors = {
 };
 
 const TaskCard = ({ task, onDragStart, onDelete,onOpenComments  }) => {
+  const isDueSoon = task.dueDate && new Date(task.dueDate) - new Date() < 24 * 60 * 60 * 1000 && new Date(task.dueDate) > new Date();
+  const isOverdue = task.dueDate && new Date(task.dueDate) < new Date();
+
   return (
     <div
       draggable
@@ -25,6 +28,18 @@ const TaskCard = ({ task, onDragStart, onDelete,onOpenComments  }) => {
           {task.priority}
         </span>
       </div>
+
+      {task.dueDate && (
+        <div className={`flex items-center gap-2 mb-3 p-2 rounded text-sm ${
+          isOverdue ? 'bg-red-100 text-red-800' : isDueSoon ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-50 text-blue-800'
+        }`}>
+          <Clock size={14} />
+          <span className="font-medium">
+            {isOverdue ? 'Overdue: ' : isDueSoon ? 'Due Soon: ' : 'Due: '}
+            {new Date(task.dueDate).toLocaleDateString()}
+          </span>
+        </div>
+      )}
 
       {task.assignedTo && (
         <div className="flex items-center gap-2 mb-3 p-2 bg-white rounded border border-gray-200">
