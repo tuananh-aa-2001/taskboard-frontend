@@ -1,4 +1,4 @@
-import { Trash2} from 'lucide-react';
+import { Trash2, MessageSquare} from 'lucide-react';
 import Avatar from './Avatar';
 
 const priorityColors = {
@@ -8,7 +8,7 @@ const priorityColors = {
   URGENT: 'bg-red-100 text-red-800'
 };
 
-const TaskCard = ({ task, onDragStart, onDelete }) => {
+const TaskCard = ({ task, onDragStart, onDelete,onOpenComments  }) => {
   return (
     <div
       draggable
@@ -42,13 +42,27 @@ const TaskCard = ({ task, onDragStart, onDelete }) => {
         </div>
       )}
       
-      <button
-        onClick={() => onDelete(task.id)}
-        className="w-full px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors text-sm font-medium flex items-center justify-center gap-2"
-      >
-        <Trash2 size={14} />
-        Delete
-      </button>
+     <div className="flex gap-2">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onOpenComments(task);
+          }}
+          className="flex-1 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-sm font-medium flex items-center justify-center gap-2"
+        >
+          <MessageSquare size={14} />
+          Comments
+        </button>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(task.id);
+          }}
+          className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors text-sm font-medium"
+        >
+          <Trash2 size={14} />
+        </button>
+      </div>
     </div>
   );
 };
