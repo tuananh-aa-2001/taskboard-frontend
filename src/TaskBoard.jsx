@@ -36,13 +36,18 @@ const TaskBoard = ({
 
   const loadTasks = useCallback(async (boardId) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/tasks/board/${boardId}`);
+      // Include credentials for session-based auth (cookies)
+      const response = await fetch(`http://localhost:8080/api/tasks/board/${boardId}`, {
+        method: 'GET',
+        credentials: 'include'
+      });
       const data = await response.json();
       onTasksChange(data);
     } catch (error) {
       console.error('Error loading tasks:', error);
     }
   }, [onTasksChange]);
+  
 
   const createTask = useCallback(() => {
     if (!currentBoardId) {

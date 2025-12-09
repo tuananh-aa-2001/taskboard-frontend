@@ -121,6 +121,7 @@ const App = () => {
           isConnected={isConnected}
           connect={connect}
           activeUsers={activeUsers}
+          onNotification={addNotification}
         />
 
         {/* Boards Component */}

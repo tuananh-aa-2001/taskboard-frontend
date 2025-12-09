@@ -20,7 +20,12 @@ const Board = ({
 
   const loadBoards = useCallback(async () => {
     try {
-      const response = await fetch(`http://localhost:8080/api/boards/user/${username}`);
+      // Include credentials for session-based auth (cookies)
+      const response = await fetch(`http://localhost:8080/api/boards/user/${username}`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+      // Normalize payload: server may return an array or an object { boards: [] }
       const data = await response.json();
       // Normalize payload: server may return an array or an object { boards: [] }
       const boardsArray = Array.isArray(data)
@@ -37,9 +42,11 @@ const Board = ({
 
   const createBoard = useCallback(async () => {
     try {
+      // Include credentials for session-based auth (cookies)
       const response = await fetch('http://localhost:8080/api/boards', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ ...newBoard, owner: username })
       });
       const board = await response.json();
