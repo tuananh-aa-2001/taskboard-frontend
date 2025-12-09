@@ -47,7 +47,7 @@ const TaskBoard = ({
       console.error('Error loading tasks:', error);
     }
   }, [onTasksChange]);
-  
+
 
   const createTask = useCallback(() => {
     if (!currentBoardId) {
@@ -334,6 +334,9 @@ const TaskBoard = ({
         setShowFilters={setShowFilters}
         getUniqueAssignees={getUniqueAssignees}
         clearFilters={clearFilters}
+        getTasksByStatus = {getTasksByStatus}
+        tasks = {tasks}
+        username = {username}
       />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

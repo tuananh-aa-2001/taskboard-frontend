@@ -1,4 +1,5 @@
 import { Search, Filter } from 'lucide-react';
+import ExportPDF from './ExportPDF';
 
 const TaskFilters = ({
   searchQuery,
@@ -10,14 +11,20 @@ const TaskFilters = ({
   showFilters,
   setShowFilters,
   getUniqueAssignees,
-  clearFilters
+  clearFilters,
+  getTasksByStatus,
+  tasks,
+  username,
 }) => {
   return (
     <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
       <div className="flex flex-col md:flex-row gap-4">
         {/* Search Bar */}
         <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+          <Search
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+            size={20}
+          />
           <input
             type="text"
             value={searchQuery}
@@ -34,11 +41,19 @@ const TaskFilters = ({
         >
           <Filter size={18} />
           Filters
-          {(filterPriority !== 'ALL' || filterAssignee !== 'ALL') && (
+          {(filterPriority !== "ALL" || filterAssignee !== "ALL") && (
             <span className="bg-white text-purple-600 rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">
-              {(filterPriority !== 'ALL' ? 1 : 0) + (filterAssignee !== 'ALL' ? 1 : 0)}
+              {(filterPriority !== "ALL" ? 1 : 0) +
+                (filterAssignee !== "ALL" ? 1 : 0)}
             </span>
           )}
+        </button>
+
+        <button
+          onClick={() => ExportPDF({ getTasksByStatus, tasks, username })}
+          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold flex items-center gap-2"
+        >
+          Export PDF
         </button>
       </div>
 
@@ -48,7 +63,9 @@ const TaskFilters = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Priority Filter */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Priority</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Priority
+              </label>
               <select
                 value={filterPriority}
                 onChange={(e) => setFilterPriority(e.target.value)}
@@ -64,7 +81,9 @@ const TaskFilters = ({
 
             {/* Assignee Filter */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Assignee</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Assignee
+              </label>
               <select
                 value={filterAssignee}
                 onChange={(e) => setFilterAssignee(e.target.value)}
@@ -73,15 +92,19 @@ const TaskFilters = ({
                 <option value="ALL">All Assignees</option>
                 <option value="ME">Assigned to Me</option>
                 <option value="UNASSIGNED">Unassigned</option>
-                {getUniqueAssignees().map(assignee => (
-                  <option key={assignee} value={assignee}>{assignee}</option>
+                {getUniqueAssignees().map((assignee) => (
+                  <option key={assignee} value={assignee}>
+                    {assignee}
+                  </option>
                 ))}
               </select>
             </div>
           </div>
 
           {/* Clear Filters Button */}
-          {(searchQuery || filterPriority !== 'ALL' || filterAssignee !== 'ALL') && (
+          {(searchQuery ||
+            filterPriority !== "ALL" ||
+            filterAssignee !== "ALL") && (
             <div className="mt-4">
               <button
                 onClick={clearFilters}

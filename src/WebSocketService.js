@@ -86,10 +86,20 @@ class WebSocketService {
   disconnect() {
     if (this.ws && this.username) {
       this.send("/app/user.leave", this.username);
+      // Give time for the message to be sent before closing
+      setTimeout(() => {
+        if (this.ws) {
+          this.ws.close();
+        }
+      }, 100);
+    } else if (this.ws) {
       this.ws.close();
     }
     this.isConnected = false;
     this.subscriptions = {};
+  }
+  getConnectionStatus() {
+    return this.isConnected;
   }
 }
 

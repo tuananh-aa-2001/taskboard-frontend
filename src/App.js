@@ -33,12 +33,18 @@ const App = () => {
 
   useEffect(() => {
     const currentWs = ws.current;
-    return () => {
-      if (currentWs) {
+    const handleBeforeUnload = () => {
+      if (currentWs && username) {
         currentWs.disconnect();
       }
     };
-  }, []);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      currentWs.disconnect();
+    };
+  }, [username]);
 
   useEffect(() => {
     if (!isConnected || !username) return;
