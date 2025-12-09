@@ -1,4 +1,5 @@
 import { Search, Filter } from 'lucide-react';
+import { ArrowDownTrayIcon } from '@heroicons/react/24/solid';
 import ExportPDF from './ExportPDF';
 
 const TaskFilters = ({
@@ -52,7 +53,8 @@ const TaskFilters = ({
         <button
           onClick={() => ExportPDF({ getTasksByStatus, tasks, username })}
           className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold flex items-center gap-2"
-        >
+        >   
+          <ArrowDownTrayIcon className="w-5 h-5" />
           Export PDF
         </button>
       </div>
