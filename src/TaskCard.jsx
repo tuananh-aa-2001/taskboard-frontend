@@ -30,15 +30,15 @@ const TaskCard = ({ task, onDragStart, onDelete,onOpenComments  }) => {
       </div>
 
       {task.dueDate && (
-        <div className={`flex items-center gap-2 mb-3 p-2 rounded text-sm ${
-          isOverdue ? 'bg-red-100 text-red-800' : isDueSoon ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-50 text-blue-800'
-        }`}>
-          <Clock size={14} />
-          <span className="font-medium">
-            {isOverdue ? 'Overdue: ' : isDueSoon ? 'Due Soon: ' : 'Due: '}
-            {new Date(task.dueDate).toLocaleDateString()}
-          </span>
-        </div>
+          <div className={`flex items-center gap-2 mb-3 p-2 rounded text-sm ${
+            isOverdue ? 'bg-red-100 text-red-800' : isDueSoon ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-50 text-blue-800'
+          }`}>
+            <Clock size={14} />
+            <span className="font-medium">
+              {isOverdue ? 'Overdue: ' : isDueSoon ? 'Due Soon: ' : 'Due: '}
+              {new Date(task.dueDate).toLocaleDateString()} {new Date(task.dueDate).toLocaleTimeString()}
+            </span>
+          </div>
       )}
 
       {task.assignedTo && (

@@ -22,14 +22,18 @@ const Board = ({
     try {
       const response = await fetch(`http://localhost:8080/api/boards/user/${username}`);
       const data = await response.json();
-      setBoards(data);
-      if (data.length > 0 && !currentBoardId) {
-        onBoardSelect(data[0].id);
+      // Normalize payload: server may return an array or an object { boards: [] }
+      const boardsArray = Array.isArray(data)
+        ? data
+        : (data && Array.isArray(data.boards) ? data.boards : []);
+      setBoards(boardsArray);
+      if (boardsArray.length > 0 && !currentBoardId) {
+        onBoardSelect(boardsArray[0].id);
       }
     } catch (error) {
       console.error('Error loading boards:', error);
     }
-  }, [username, onBoardSelect]);
+  }, [username,currentBoardId, onBoardSelect]);
 
   const createBoard = useCallback(async () => {
     try {
@@ -59,16 +63,42 @@ const Board = ({
   useEffect(() => {
     if (isConnected) {
       const handleBoardMessage = (message) => {
-        if (message.type === 'BOARD_CREATED') {
-          setBoards(prev => [...prev, message.board]);
-          onNotification?.(`Board "${message.board.name}" created`, 'info');
-        } else if (message.type === 'BOARD_UPDATED') {
-          setBoards(prev => 
-            prev.map(b => b.id === message.board.id ? message.board : b)
-          );
-        } else if (message.type === 'BOARD_DELETED') {
-          setBoards(prev => prev.filter(b => b.id !== message.boardId));
-          onNotification?.('Board deleted', 'info');
+        // Normalize incoming message shapes. Message may contain a `board`,
+        // or the payload itself may be a board object. Defensive handling
+        // prevents state from becoming a non-array.
+        try {
+          const type = message.type;
+          const payloadBoard = message.board ?? (message.payload ?? message);
+
+          if (type === 'BOARD_CREATED') {
+            const board = payloadBoard;
+            if (board) setBoards(prev => Array.isArray(prev) ? [...prev, board] : [board]);
+            onNotification?.(`Board "${board?.name}" created`, 'info');
+          } else if (type === 'BOARD_UPDATED') {
+            const board = payloadBoard;
+            if (board) setBoards(prev => Array.isArray(prev)
+              ? prev.map(b => b.id === board.id ? board : b)
+              : [board]
+            );
+          } else if (type === 'BOARD_DELETED') {
+            const boardId = message.boardId ?? message.id ?? payloadBoard?.id;
+            setBoards(prev => Array.isArray(prev) ? prev.filter(b => b.id !== boardId) : []);
+            onNotification?.('Board deleted', 'info');
+          } else if (type === 'BOARD_LIST') {
+            // Replace full list
+            const list = Array.isArray(message.boards) ? message.boards : (Array.isArray(message.payload) ? message.payload : []);
+            setBoards(list);
+          } else {
+            // unexpected shape: log for debugging
+            if (message && (message.boards || message.board)) {
+              // Try to salvage boards list
+              if (Array.isArray(message.boards)) setBoards(message.boards);
+            } else {
+              console.warn('Unexpected board message shape:', message);
+            }
+          }
+        } catch (err) {
+          console.error('Error handling board message:', err, message);
         }
       };
       ws.current.subscribe('/topic/boards', handleBoardMessage);
@@ -127,7 +157,7 @@ const Board = ({
       )}
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {boards.map(board => (
+        {Array.isArray(boards) && boards.map(board => (
           <div 
             key={board.id} 
             onClick={() => onBoardSelect(board.id)} 

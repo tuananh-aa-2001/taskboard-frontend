@@ -60,7 +60,8 @@ class WebSocketService {
       }
     }
 
-    body = body.replace(/\x00/g, "");
+    // Avoid regex literal with control chars (ESLint error); use RegExp constructor
+    body = body.replace(new RegExp('\\x00', 'g'), "");
 
     if (destination && this.subscriptions[destination]) {
       try {
